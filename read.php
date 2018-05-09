@@ -8,9 +8,9 @@ try {
 
    while ($row = $sqldata->fetch()) {
         $db_data[] = array(
-                'id'=>$row['id']."(id)",
-                'name'=>$row['name']."(name)",
-                'grade'=>$row['grade']."(grade)"
+                'id'=>$row['id'],
+                'name'=>$row['name'],
+                'grade'=>$row['grade']
                     );
       }
 
@@ -18,10 +18,10 @@ try {
     $response['read_data'] = $db_data;
 
     //JSONデータ出力
-    // header("Content-type: application/json; charset=UTF-8");
+    header("Content-type: application/json; charset=UTF-8");
     echo json_encode($response);
     $db=null;
-
+    // header( "Location: http://192.168.0.159/2018grade4/kaihatu_zemi/akaeda/EESystem_W/modeselect.html" ) ;
   } catch (Exception $e) {
 }
 ?>
