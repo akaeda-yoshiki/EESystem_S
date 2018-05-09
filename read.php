@@ -15,11 +15,11 @@ try {
       }
 
     //responseの準備
-    $response['read_data'] = $db_data;
+    // $response['read_data'] = $db_data;
 
     //JSONデータ出力
     header("Content-type: application/json; charset=UTF-8");
-    echo json_encode($response);
+    echo json_encode($db_data);
     $db=null;
     // header( "Location: http://192.168.0.159/2018grade4/kaihatu_zemi/akaeda/EESystem_W/modeselect.html" ) ;
   } catch (Exception $e) {
