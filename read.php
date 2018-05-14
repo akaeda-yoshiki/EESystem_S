@@ -3,7 +3,7 @@
 try {
     $db =new PDO('mysql:host=192.168.0.159;dbname=akaeda;','miyashita','sonicdance');
 
-   $sqldata = $db->prepare('SELECT *FROM data');
+   $sqldata = $db->prepare('SELECT *FROM user');
    $sqldata->execute();
 
    while ($row = $sqldata->fetch()) {

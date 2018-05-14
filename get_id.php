@@ -7,8 +7,8 @@ try {
     $db =new PDO('mysql:host=192.168.0.159;dbname=akaeda;','miyashita','sonicdance');
 
 //    $sqldata = $db->prepare('SELECT *FROM data WHERE id = '+$_GET['id']);
-$sqldata = $db->prepare('SELECT *FROM data WHERE id = 5');
-   $sqldata->execute();
+$sqldata = $db->prepare('SELECT *FROM user WHERE id=?');
+   $sqldata->execute(array($_GET['id']));
 
    while ($row = $sqldata->fetch()) {
         $db_data[] = array(
