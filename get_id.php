@@ -24,11 +24,6 @@ $sqldata = $db->prepare('SELECT *FROM user WHERE id=?');
     //JSONデータ出力
     header("Content-type: application/json; charset=UTF-8");
     echo json_encode($db_data);
-    // echo json_encode(array(
-    //     "status" => 1, // 処理結果(今回は1なら正常という意味とする)
-    //     "result" => array( // アプリ側に返却したいがあればresult以下にセットすることとする
-            // "userList" => array(
-            //     array("id" => "1", "name"=>"ユーザー1")))));
     $db=null;
     // header( "Location: http://192.168.0.159/2018grade4/kaihatu_zemi/akaeda/EESystem_W/modeselect.html" ) ;
   } catch (Exception $e) {
