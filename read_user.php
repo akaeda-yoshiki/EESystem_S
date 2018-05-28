@@ -1,5 +1,4 @@
 <?php
-//SQLのデータandroidアプリに送信します。
 try {
     $db =new PDO('mysql:host=192.168.0.159;dbname=akaeda;','miyashita','sonicdance');
 
@@ -21,7 +20,6 @@ try {
     header("Content-type: application/json; charset=UTF-8");
     echo json_encode($db_data);
     $db=null;
-    // header( "Location: http://192.168.0.159/2018grade4/kaihatu_zemi/akaeda/EESystem_W/modeselect.html" ) ;
   } catch (Exception $e) {
 }
 ?>
