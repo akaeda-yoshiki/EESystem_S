@@ -33,7 +33,6 @@ if(isset($_GET['id'])) {
               }
         
             // echo $db_data;
-            
             if(empty($db_data[0]["id"])){
                 $write=$db->prepare('INSERT INTO now_enter (id, enter_time) VALUES(:id, :enter_time)');
                 $write->bindvalue(':id',$_GET['id']);
@@ -81,7 +80,6 @@ if(isset($_GET['id'])) {
             $write->bindvalue(':id',$_GET['id']);
             $write->bindvalue(':name',$_GET['name']);
             $write->bindvalue(':grade',$_GET['grade']);
-    
             $write->execute();
             // 切断
             $db = null;
@@ -93,7 +91,40 @@ if(isset($_GET['id'])) {
         }
     }    
 }
+echo calculate_staytime("2018_4_15_16:50", "2018_4_15_17:58");
 
+    //滞在時間の計算
+    function calculate_staytime($enter, $exit){
+    $enter = explode("_", $enter);
+    $exit = explode("_", $exit);
+    // echo $enter;
+    $enter_time = explode(":", $enter[3]);
+    $exit_time = explode(":", $exit[3]);
 
+    $stay_time = array("", "", "", "", "");
+    $enter = array($enter[0], $enter[1], $enter[2], $enter_time[0], $enter_time[1]);
+    $exit = array($exit[0], $exit[1], $exit[2], $exit_time[0], $exit_time[1]);
+    for($i = 0; $i < 5; $i++){
+        if($enter[$i] < $exit[$i]){//
+            $stay_time[$i] = $exit[$i] - $enter[$i];
+        }
+        else{//繰り下げ計算
+
+        }
+    }
+    
+    $word = array("年間", "月間", "日間", "時間", "分間");
+    $return_word = "";
+    for($i = 0; $i < 5; $i++)
+        if($stay_time[$i] != ""){
+            $return_word .= $stay_time[$i];
+            $return_word .= $word[$i];
+        }
+    return $return_word;
+}
+
+function calculate_support(){
+
+}
 
 ?>
