@@ -2,7 +2,7 @@
 
  //ここでは送信されたデータをもとにSQLにデータを挿入してきます。
 if(isset($_GET['id'])) {
-    if(isset($_GET['time'])) {//入退室データを入力
+    if(isset($_GET['time1']) && isset($_GET['time2'])) {//入退室データを入力
 
 
         try{
@@ -23,29 +23,33 @@ if(isset($_GET['id'])) {
                }
 
 
-            $sqldata = $db->prepare("SELECT id, enter_time FROM now_enter WHERE id = $_GET[id]");
-            $sqldata->execute();
+            $sqldata = $db->prepare("SELECT id, enter_time, enter_time1 FROM now_enter WHERE id=?");
+            $sqldata->execute(array($_GET['id']));
               while ($row = $sqldata->fetch()) {
                 $db_data[] = array(
                         'id'=>$row['id'],
-                        'enter_time'=>$row['enter_time']
-                            );
+                        'enter_time'=>$row['enter_time'],
+                        'enter_time1'=>$row['enter_time1']
+                    );
               }
         
             if(empty($db_data[0]["id"])){//入室
-                $write=$db->prepare('INSERT INTO now_enter (id, enter_time) VALUES(:id, :enter_time)');
+                $write=$db->prepare('INSERT INTO now_enter (id, enter_time, enter_time1) VALUES(:id, :enter_time, :enter_time1)');
                 $write->bindvalue(':id',$_GET['id']);
-                $write->bindvalue(':enter_time',$_GET['time']);
+                $write->bindvalue(':enter_time',$_GET['time1']);
+                $write->bindvalue(':enter_time1',$_GET['time2']);
                 $write->execute();
                 $data[0]['stats'] = "1";
             }
             else{//退室
                 //累積データへ入力
-                $write=$db->prepare('INSERT INTO data (id, enter_time, exit_time, stay) VALUES(:id, :enter_time, :exit_time, :stay)');
-                $write->bindvalue(':id',$_GET['id']);
+                $write=$db->prepare('INSERT INTO data (enter_time, enter_time1, id, exit_time, exit_time1, stay) VALUES(:enter_time, :enter_time1, :id, :exit_time, :exit_time1, :stay)');
                 $write->bindvalue(':enter_time',$db_data[0]["enter_time"]);
-                $write->bindvalue(':exit_time',$_GET['time']);
-                $write->bindvalue(':stay',calculate_staytime($db_data[0]["enter_time"], $_GET['time']));
+                $write->bindvalue(':enter_time1',$db_data[0]["enter_time1"]);
+                $write->bindvalue(':id',$_GET['id']);
+                $write->bindvalue(':exit_time',$_GET['time1']);
+                $write->bindvalue(':exit_time1',$_GET['time2']);
+                $write->bindvalue(':stay',calculate_staytime($db_data[0]["enter_time"] , $db_data[0]["enter_time1"], $_GET['time1'] , $_GET['time2']));
                 $write->execute();
 
                 //現在の入室者データから削除
@@ -87,17 +91,19 @@ if(isset($_GET['id'])) {
 // echo calculate_staytime("2018_3_15_16:50", "2019_1_13_19:38");
 
     //滞在時間の計算
-function calculate_staytime($enter, $exit){
+function calculate_staytime($enter, $enter1, $exit, $exit1){
     $stay_time = array("", "", "", "", "");//滞在時間の計算結果を格納する変数
 
     //文字列から数字へ分割
-    $enter = explode("_", $enter);
-    $exit = explode("_", $exit);
-    $enter_time = explode(":", $enter[3]);
-    $exit_time = explode(":", $exit[3]);
+    // $enter = explode("_", $enter);
+    // $exit = explode("_", $exit);
+    // $enter_time = explode(":", $enter[3]);
+    // $exit_time = explode(":", $exit[3]);
     //分割したものを計算しやすいようにまとめる
-    $enter = array($enter[0], $enter[1], $enter[2], $enter_time[0], $enter_time[1]);
-    $exit = array($exit[0], $exit[1], $exit[2], $exit_time[0], $exit_time[1]);
+    $enter = array(substr($enter, 0, 4), substr($enter, 4, 2), substr($enter, 6, 4), substr($enter1, 0, 2), substr($enter1, 3, 2));
+    $exit = array(substr($exit, 0, 4), substr($exit, 4, 2), substr($exit, 6, 4), substr($exit1, 0, 2), substr($exit1, 3, 2));
+    // $enter = array($enter[0], $enter[1], $enter[2], $enter_time[0], $enter_time[1]);
+    // $exit = array($exit[0], $exit[1], $exit[2], $exit_time[0], $exit_time[1]);
 
     //計算
     for($i = 4; $i > -1; $i--){
