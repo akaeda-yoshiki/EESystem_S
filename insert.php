@@ -49,8 +49,8 @@ if(isset($_GET['id'])) {
                 $write->execute();
 
                 //現在の入室者データから削除
-                $sqldata = $db->prepare("DELETE FROM now_enter WHERE id = $_GET[id]");
-                $sqldata->execute();
+                $sqldata = $db->prepare('DELETE FROM now_enter WHERE id=?');
+                $sqldata->execute(array($_GET["id"]));
                 $data[0]['stats'] = "0";
             }
 
