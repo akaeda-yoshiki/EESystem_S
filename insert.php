@@ -32,41 +32,34 @@ if(isset($_GET['id'])) {
                             );
               }
         
-            // echo $db_data;
-            if(empty($db_data[0]["id"])){
+            if(empty($db_data[0]["id"])){//入室
                 $write=$db->prepare('INSERT INTO now_enter (id, enter_time) VALUES(:id, :enter_time)');
                 $write->bindvalue(':id',$_GET['id']);
                 $write->bindvalue(':enter_time',$_GET['time']);
                 $write->execute();
                 $data[0]['stats'] = "1";
-                // echo "新規追加";
             }
-            else{
+            else{//退室
+                //累積データへ入力
                 $write=$db->prepare('INSERT INTO data (id, enter_time, exit_time, stay) VALUES(:id, :enter_time, :exit_time, :stay)');
                 $write->bindvalue(':id',$_GET['id']);
                 $write->bindvalue(':enter_time',$db_data[0]["enter_time"]);
                 $write->bindvalue(':exit_time',$_GET['time']);
-                $write->bindvalue(':stay',0);
+                $write->bindvalue(':stay',calculate_staytime($db_data[0]["enter_time"], $_GET['time']));
                 $write->execute();
-                // echo "累積データへ<br />";
 
+                //現在の入室者データから削除
                 $sqldata = $db->prepare("DELETE FROM now_enter WHERE id = $_GET[id]");
                 $sqldata->execute();
                 $data[0]['stats'] = "0";
-
-                // echo json_encode($db_data);
-                // echo "削除";
             }
 
             //JSONデータ出力
             header("Content-type: application/json; charset=UTF-8");
             echo json_encode($data);
-                
-            // 切断
-            $db = null;
-            // header( "Location: http://192.168.0.159/2018grade4/kaihatu_zemi/akaeda/EESystem_W/modeselect.html" ) ;
-        } catch(PDOException $e){
-            // echo "データベース接続失敗" . PHP_EOL;
+                            
+            $db = null;// 切断
+        } catch(PDOException $e){ //データベース接続失敗
             echo $e->getMessage();
             exit;
         }
@@ -91,40 +84,61 @@ if(isset($_GET['id'])) {
         }
     }    
 }
-echo calculate_staytime("2018_4_15_16:50", "2018_4_15_17:58");
+// echo calculate_staytime("2018_3_15_16:50", "2019_1_13_19:38");
 
     //滞在時間の計算
-    function calculate_staytime($enter, $exit){
+function calculate_staytime($enter, $exit){
+    $stay_time = array("", "", "", "", "");//滞在時間の計算結果を格納する変数
+
+    //文字列から数字へ分割
     $enter = explode("_", $enter);
     $exit = explode("_", $exit);
-    // echo $enter;
     $enter_time = explode(":", $enter[3]);
     $exit_time = explode(":", $exit[3]);
-
-    $stay_time = array("", "", "", "", "");
+    //分割したものを計算しやすいようにまとめる
     $enter = array($enter[0], $enter[1], $enter[2], $enter_time[0], $enter_time[1]);
     $exit = array($exit[0], $exit[1], $exit[2], $exit_time[0], $exit_time[1]);
-    for($i = 0; $i < 5; $i++){
-        if($enter[$i] < $exit[$i]){//
+
+    //計算
+    for($i = 4; $i > -1; $i--){
+        if($enter[$i] < $exit[$i]){
             $stay_time[$i] = $exit[$i] - $enter[$i];
         }
-        else{//繰り下げ計算
+        else if($enter[$i] > $exit[$i]){//繰り下げ計算
+            switch ($i) {
+                case 4://分
+                    $stay_time[$i] = 60 + $exit[$i] - $enter[$i];
+                    $exit[$i - 1]--;
+                    break;
+                case 3://時
+                    $stay_time[$i] = 24 + $exit[$i] - $enter[$i];
+                    $exit[$i - 1]--;
+                    break;
+                case 2://日
+                    $exit[$i - 1]--;
+                    if($exit[4] > 1)
+                        $stay_time[$i] = date("t", mktime(0, 0, 0, $exit[3] % 12 + 1, $exit[4])) + $exit[$i] - $enter[$i];
+                    else
+                        $stay_time[$i] = date("t", mktime(0, 0, 0, $exit[3] % 12, $exit[4] - 1)) + $exit[$i] - $enter[$i];
+                    break;
+                case 1://月
+                    $stay_time[$i] = 12 + $exit[$i] - $enter[$i];
+                    $exit[$i - 1]--;
+                    break;
+    
 
+            }
         }
     }
     
-    $word = array("年間", "月間", "日間", "時間", "分間");
-    $return_word = "";
+    $word = array("年間", "ヵ月", "日", "時間", "分");
+    $return_word = "";//返り値
     for($i = 0; $i < 5; $i++)
         if($stay_time[$i] != ""){
             $return_word .= $stay_time[$i];
             $return_word .= $word[$i];
         }
     return $return_word;
-}
-
-function calculate_support(){
-
 }
 
 ?>
