@@ -8,10 +8,10 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
       $b = "";
       if(isset($_GET['data2'])){
         $b = $_GET['data2'];
-        $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b' AND user.id=?");
+        $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b' AND user.id=?");
       }
       else{
-        $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a' AND user.id=?");
+        $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a' AND user.id=?");
       }
   
       $sqldata->execute(array($_GET['id']));
@@ -22,10 +22,10 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
       $b = "";
       if(isset($_GET['data2'])){
         $b = $_GET['data2'];
-        $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b'");
+        $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b'");
       }
       else{
-        $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a'");
+        $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a'");
       }
       $sqldata->execute();
     }
@@ -34,7 +34,9 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
             'name'=>$row['name'],
             'grade'=>$row['grade'],
             'enter_time'=>$row['enter_time'],
+            'enter_time1'=>$row['enter_time1'],
             'exit_time'=>$row['exit_time'],
+            'exit_time1'=>$row['exit_time1'],
             'stay'=>$row['stay']
                 );
     }
@@ -50,11 +52,11 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
   try {
     $db =new PDO('mysql:host=192.168.0.159;dbname=akaeda;','miyashita','sonicdance');
     if($_GET['id'] != "all"){
-      $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND user.id=?");
+      $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND user.id=?");
       $sqldata->execute(array($_GET['id']));
     }
     else{
-      $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id");
+      $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id");
       $sqldata->execute();
     }
     while ($row = $sqldata->fetch()) {
@@ -62,7 +64,9 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
             'name'=>$row['name'],
             'grade'=>$row['grade'],
             'enter_time'=>$row['enter_time'],
+            'enter_time1'=>$row['enter_time1'],
             'exit_time'=>$row['exit_time'],
+            'exit_time1'=>$row['exit_time1'],
             'stay'=>$row['stay']
                 );
     }
@@ -81,10 +85,10 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
     $b = "";
     if(isset($_GET['data2'])){
       $b = $_GET['data2'];
-      $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b'");
+      $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time>='$a' AND data.enter_time<='$b'");
     }
     else{
-      $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a'");
+      $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id AND data.enter_time='$a'");
     }
       $sqldata->execute();
 
@@ -93,7 +97,9 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
             'name'=>$row['name'],
             'grade'=>$row['grade'],
             'enter_time'=>$row['enter_time'],
+            'enter_time1'=>$row['enter_time1'],
             'exit_time'=>$row['exit_time'],
+            'exit_time1'=>$row['exit_time1'],
             'stay'=>$row['stay']
                 );
     }
@@ -108,14 +114,16 @@ if(isset($_GET['id']) && isset($_GET['data1'])){
 else
   try {
       $db =new PDO('mysql:host=192.168.0.159;dbname=akaeda;','miyashita','sonicdance');
-      $sqldata = $db->prepare("SELECT name, grade, enter_time, exit_time, stay FROM user, data WHERE data.id = user.id");
+      $sqldata = $db->prepare("SELECT name, grade, enter_time, enter_time1, exit_time, exit_time1, stay FROM user, data WHERE data.id = user.id");
       $sqldata->execute();
       while ($row = $sqldata->fetch()) {
       $db_data[] = array(
               'name'=>$row['name'],
               'grade'=>$row['grade'],
               'enter_time'=>$row['enter_time'],
+              'enter_time1'=>$row['enter_time1'],
               'exit_time'=>$row['exit_time'],
+              'exit_time1'=>$row['exit_time1'],
               'stay'=>$row['stay']
                   );
       }
